@@ -4,10 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var config = require('./config/master');
 
+mongoose.connect(config.master.mongo);
 var app = express();
 
 // view engine setup
@@ -56,5 +59,11 @@ app.use(function(err, req, res, next) {
   });
 });
 
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+    console.log("Mongo is listen in " + config.master.mongo );
+});
 
+var Capture = require('./models/capture');
 module.exports = app;
